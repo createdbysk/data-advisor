@@ -22,5 +22,9 @@
   "homepage": "https://github.com/satvidh/data-advisor",
   "devDependencies": {
     "mocha": "^2.2.5"
+  },
+  "dependencies": {
+    "commander": "^2.8.1",
+    "requirejs": "^2.1.20"
   }
 }
