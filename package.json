@@ -1,0 +1,26 @@
+{
+  "name": "data-advisor",
+  "version": "0.0.1",
+  "description": "Provide an unified view of your data, both local and on the cloud.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/satvidh/data-advisor.git"
+  },
+  "keywords": [
+    "data",
+    "advisor"
+  ],
+  "author": "Satish Kumar",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/satvidh/data-advisor/issues"
+  },
+  "homepage": "https://github.com/satvidh/data-advisor",
+  "devDependencies": {
+    "mocha": "^2.2.5"
+  }
+}
