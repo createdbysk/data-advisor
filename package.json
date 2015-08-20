@@ -21,10 +21,13 @@
   },
   "homepage": "https://github.com/satvidh/data-advisor",
   "devDependencies": {
-    "mocha": "^2.2.5"
+    "expect.js": "^0.3.1",
+    "mocha": "^2.2.5",
+    "sinon": "^1.16.0"
   },
   "dependencies": {
     "commander": "^2.8.1",
-    "requirejs": "^2.1.20"
+    "requirejs": "^2.1.20",
+    "library": "git+ssh://git@github.com:satvidh/library.git#0.0.4"
   }
 }

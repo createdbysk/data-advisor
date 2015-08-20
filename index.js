@@ -5,5 +5,5 @@ requirejs.config({
 });
 
 requirejs(['src/app'], function (app) {
-    app(requirejs);
+    app(requirejs, process);
 });
