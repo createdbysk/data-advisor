@@ -5,18 +5,16 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.data-advisor</groupId>
-    <!--
-        From Development Principles:
-
-        Use this project to learn how things work.
-        You learn at school, hence the name school.
-    -->
-    <artifactId>school</artifactId>
+    <artifactId>local</artifactId>
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
 
+
     <properties>
+        <!-- Spring -->
         <spring.version>4.2.0.RELEASE</spring.version>
+        <!-- Test -->
+        <junit.version>4.2</junit.version>
         <!-- for maven-compiler-plugin -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -24,13 +22,19 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.2</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>1.9.5</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -75,7 +79,7 @@
                         </goals>
                         <configuration>
                             <!-- Optional Start -->
-                            <finalName>TestApp</finalName>
+                            <finalName>DataAdvisor</finalName>
                             <shadedArtifactAttached>true</shadedArtifactAttached>
                             <shadedClassifierName>jar-with-dependencies</shadedClassifierName>
                             <!-- Optional End -->
