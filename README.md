@@ -2,7 +2,12 @@
 Provide a unified view of all data you own, locally and on the web
 
 # Design principles
-* Use dependency injection and inversion of control.
+Do not change the numbering of these design principles because comments in code refer to them by their number. 
+I do not foresee the need to eliminate any of the design principles.
+Of course, I am aware that the only thing I can foresee with absolute certainty is that things will change. 
+Therefore, if you want to deprecate a design principle, just mark it so, but do not delete it.
+1. Use dependency injection and inversion of control.
+2. Verify that the injected entities are configured correctly for dependency injection.
 
 # Development principles new concepts. 
   * Add copious documentation to allow future generations to learn from past school experience.
@@ -18,4 +23,10 @@ Provide a unified view of all data you own, locally and on the web
 # Development environment setup
 ## Add advisor as a known word to the dictionary
 Intellij flags advisor in data_adivsor as an incorrect word. When you see this issue, choose the option to save adivsor to the dictionary 
-to eliminate this issue. 
+to eliminate this issue.
+ 
+# References
+## Storm
+* [Understanding the parallelism of a Storm topology](http://www.michael-noll.com/blog/2012/10/16/understanding-the-parallelism-of-a-storm-topology/)
+## JUnit and Spring tests
+* https://spring.io/blog/2011/06/21/spring-3-1-m2-testing-with-configuration-classes-and-profiles
