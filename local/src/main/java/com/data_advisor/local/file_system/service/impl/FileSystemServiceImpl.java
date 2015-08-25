@@ -2,6 +2,8 @@ package com.data_advisor.local.file_system.service.impl;
 
 import com.data_advisor.local.file_system.service.FileSystemService;
 import org.apache.storm.guava.annotations.VisibleForTesting;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -17,12 +19,15 @@ import java.util.Set;
  */
 @Service
 public class FileSystemServiceImpl implements FileSystemService {
+    private Logger logger = LoggerFactory.getLogger(FileSystemServiceImpl.class);
+
     @Override
-    public void visitPath(Path path, FileVisitor<Path> fileVisitor) {
+    public void listDirectoryContents(Path path, FileVisitor<Path> fileVisitor) {
+        logger.trace("listDirectoryContents({}, {})", path, fileVisitor);
         try {
             walkFileTree(path, EnumSet.noneOf(FileVisitOption.class), 1, fileVisitor);
         } catch (IOException e) {
-            // TODO: Log exception to eliminate warning.
+           logger.warn("walkFileTree threw an unexpected exception", e);
         }
     }
 
