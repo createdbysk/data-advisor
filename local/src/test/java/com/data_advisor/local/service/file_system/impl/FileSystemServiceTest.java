@@ -1,6 +1,6 @@
-package com.data_advisor.local.file_system.service.impl;
+package com.data_advisor.local.service.file_system.impl;
 
-import com.data_advisor.local.file_system.service.FileSystemService;
+import com.data_advisor.local.service.file_system.FileSystemService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

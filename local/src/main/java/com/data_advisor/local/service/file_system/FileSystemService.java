@@ -1,4 +1,4 @@
-package com.data_advisor.local.file_system.service;
+package com.data_advisor.local.service.file_system;
 
 import java.nio.file.FileVisitor;
 import java.nio.file.Path;
