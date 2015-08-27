@@ -81,7 +81,7 @@ public class FileSystemServiceTest {
     }
 
     @Test
-    public void testFileSystemService_CanAutoWire() {
+    public void testFileSystemService_CanAutowire() {
         assertNotNull(fileSystemServiceAutoWired);
     }
 
