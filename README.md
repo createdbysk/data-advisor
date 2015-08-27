@@ -20,6 +20,9 @@ Therefore, if you want to deprecate a design principle, just mark it so, but do 
     to configure IntelliJ to use the google coding style. 
 * Use comments to convey decisions and intent. 
   * Minimize description of implementation that can be understood by just looking at the code.
+* Eliminate all warnings reported by Intellij prior to code check-in.
+  * Use Intellij's VCS plugin to commit changes. This action will display a dialog if there are errors or warnings 
+    in the set of files in the changelist.
 
 # Decisions
 ## IDE
