@@ -22,8 +22,8 @@ public class FileSystemServiceImpl implements FileSystemService {
     private Logger logger = LoggerFactory.getLogger(FileSystemServiceImpl.class);
 
     @Override
-    public void listDirectoryContents(Path path, FileVisitor<Path> fileVisitor) {
-        logger.trace("listDirectoryContents({}, {})", path, fileVisitor);
+    public void visitPath(Path path, FileVisitor<Path> fileVisitor) {
+        logger.trace("visitPath({}, {})", path, fileVisitor);
         try {
             walkFileTree(path, EnumSet.noneOf(FileVisitOption.class), 1, fileVisitor);
         } catch (IOException e) {

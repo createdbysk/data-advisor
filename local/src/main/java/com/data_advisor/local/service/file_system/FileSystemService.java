@@ -7,5 +7,5 @@ import java.nio.file.Path;
  * Provides file system related operations.
  */
 public interface FileSystemService {
-    void listDirectoryContents(Path path, FileVisitor<Path> fileVisitor);
+    void visitPath(Path path, FileVisitor<Path> fileVisitor);
 }

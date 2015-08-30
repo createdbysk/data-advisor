@@ -92,7 +92,7 @@ public class FileSystemServiceTest {
         willDoNothing().given(fileSystemService).walkFileTree(path, options, 1, fileVisitor);
 
         // WHEN
-        fileSystemService.listDirectoryContents(path, fileVisitor);
+        fileSystemService.visitPath(path, fileVisitor);
 
         // THEN
         verify(fileSystemService, times(1)).walkFileTree(path, options, 1, fileVisitor);
@@ -107,7 +107,7 @@ public class FileSystemServiceTest {
         willThrow(expectedException).given(fileSystemService).walkFileTree(path, options, 1, fileVisitor);
 
         // WHEN
-        fileSystemService.listDirectoryContents(path, fileVisitor);
+        fileSystemService.visitPath(path, fileVisitor);
 
         // THEN
         verify(fileSystemService, times(1)).walkFileTree(path, options, 1, fileVisitor);
