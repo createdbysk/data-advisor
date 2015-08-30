@@ -12,12 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
-import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 
 import java.io.IOException;
 import java.nio.file.FileVisitOption;
@@ -39,7 +35,6 @@ import static org.mockito.BDDMockito.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 // Convention over configuration, this will automatically look for the nested @Configuration class.
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class)
-@TestExecutionListeners( { DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class, TransactionalTestExecutionListener.class })
 public class FileSystemServiceTest {
     // Use this instance to verify that the FileSystemServiceImpl has the expected annotation to be able to
     // Autowire an instance of FileSystemService.
@@ -68,7 +63,7 @@ public class FileSystemServiceTest {
     private BasicFileAttributes basicFileAttributes;
 
     @Configuration
-    @ComponentScan(basePackages = {"com.data_advisor.local.file_system.service.impl"})
+    @ComponentScan(basePackages = {"com.data_advisor.local.service.impl.file_system"})
     static class TestConfiguration {
     }
 
