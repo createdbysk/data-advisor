@@ -1,10 +1,12 @@
-package com.data_advisor.local.application.entry_point;
+package com.data_advisor.local.application.entry_point.impl;
 
+import com.data_advisor.local.application.entry_point.FileSystemAbstractFactory;
 import com.data_advisor.local.service.file_system.FileSystemService;
 import org.apache.storm.guava.annotations.VisibleForTesting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.nio.file.FileVisitor;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -13,12 +15,12 @@ import java.nio.file.Paths;
  */
 @Component
 public class LocalFileSystem {
-    private final AddHierarchyVisitor addHierarchyVisitor;
+    private final FileSystemAbstractFactory fileSystemAbstractFactory;
     private final FileSystemService fileSystemService;
 
     @Autowired
-    public LocalFileSystem(AddHierarchyVisitor addHierarchyVisitor, FileSystemService fileSystemService) {
-        this.addHierarchyVisitor = addHierarchyVisitor;
+    public LocalFileSystem(FileSystemService fileSystemService, FileSystemAbstractFactory fileSystemAbstractFactory) {
+        this.fileSystemAbstractFactory = fileSystemAbstractFactory;
         this.fileSystemService = fileSystemService;
     }
     /**
@@ -31,6 +33,7 @@ public class LocalFileSystem {
      */
     public void addHierarchy(String absolutePath) {
         Path path = createPath(absolutePath);
+        FileVisitor<Path> addHierarchyVisitor = fileSystemAbstractFactory.getFileVisitor();
         fileSystemService.visitPath(path, addHierarchyVisitor);
     }
 

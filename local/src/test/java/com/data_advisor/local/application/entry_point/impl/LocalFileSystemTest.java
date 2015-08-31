@@ -1,5 +1,6 @@
-package com.data_advisor.local.application.entry_point;
+package com.data_advisor.local.application.entry_point.impl;
 
+import com.data_advisor.local.application.entry_point.FileSystemAbstractFactory;
 import com.data_advisor.local.service.file_system.FileSystemService;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,9 +16,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
+import java.nio.file.FileVisitor;
 import java.nio.file.Path;
 
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willReturn;
 import static org.mockito.Mockito.*;
 
@@ -44,7 +47,10 @@ public class LocalFileSystemTest {
     private LocalFileSystem localFileSystem;
 
     @Mock
-    private AddHierarchyVisitor addHierarchyVisitor;
+    private FileSystemAbstractFactory addHierarchyAbstractFactory;
+
+    @Mock
+    private FileVisitor<Path> addHierarchyVisitor;
 
     @Mock
     private FileSystemService fileSystemService;
@@ -53,17 +59,20 @@ public class LocalFileSystemTest {
     private Path path;
 
     @Configuration
-    @ComponentScan(basePackages =
-            {
-                    "com.data_advisor.local.application.entry_point"
-            }
-    )
+    @ComponentScan("com.data_advisor.local.application.entry_point")
     static class TestConfiguration {
         // NOTE: Intellij Community Edition does not detect that the @Bean annotation causes
-        // the spring framework to call this function.
+        // the spring framework to call these functions.
+        // Create mocks to inject beans into the LocalFileSystem constructor.
+
         @Bean
         public FileSystemService fileSystemService() {
             return mock(FileSystemService.class);
+        }
+
+        @Bean
+        public FileSystemAbstractFactory fileSystemAbstractFactory() {
+            return mock(FileSystemAbstractFactory.class);
         }
     }
 
@@ -72,6 +81,7 @@ public class LocalFileSystemTest {
         MockitoAnnotations.initMocks(this);
 
         localFileSystem = spy(localFileSystemWithInjectedMocks);
+        given(addHierarchyAbstractFactory.getFileVisitor()).willReturn(addHierarchyVisitor);
     }
 
     @Test
@@ -83,7 +93,7 @@ public class LocalFileSystemTest {
     public void testAddHierarchy() {
         // GIVEN
         final String absolutePath = ABSOLUTE_PATH;
-        final AddHierarchyVisitor addHierarchyVisitor = this.addHierarchyVisitor;
+        final FileVisitor<Path> addHierarchyVisitor = this.addHierarchyVisitor;
         final FileSystemService fileSystemService = this.fileSystemService;
         final Path path = this.path;
 
