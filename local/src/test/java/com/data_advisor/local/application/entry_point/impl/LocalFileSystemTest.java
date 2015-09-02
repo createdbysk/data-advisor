@@ -1,6 +1,7 @@
 package com.data_advisor.local.application.entry_point.impl;
 
-import com.data_advisor.local.application.entry_point.FileSystemAbstractFactory;
+import com.data_advisor.local.application.ApplicationConfig;
+import com.data_advisor.local.application.FileSystemAbstractFactory;
 import com.data_advisor.local.service.file_system.FileSystemService;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,9 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
@@ -21,15 +19,18 @@ import java.nio.file.Path;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willReturn;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 /**
- * Test for the LocalFileSystem class.
+ * Test the Application class.
+ * Use the SpringJUnit4ClassRunner to auto-wire injected dependencies. This ensures that the dependencies don't miss
+ * expected annotations. This satisfies Design Principle #2.
+ *  2. Verify that the injected entities are configured correctly for dependency injection.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-// Convention over configuration, this will automatically look for the nested @Configuration class.
-@ContextConfiguration(loader = AnnotationConfigContextLoader.class)
+// Verify that the ApplicationConfig injects the required objects and dependencies.
+@ContextConfiguration(loader = AnnotationConfigContextLoader.class, classes = {ApplicationConfig.class})
 public class LocalFileSystemTest {
     private static final String ABSOLUTE_PATH = "/absolute_path";
 
@@ -39,15 +40,11 @@ public class LocalFileSystemTest {
     @Autowired
     private LocalFileSystem localFileSystemAutowired;
 
-    // To use a spy in order to mock the createPath implementation in localFileSystem,
-    // create an instance with @InjectMocks, which will inject the mocks. Then construct the spy in the
-    // @Before method.
     @InjectMocks
-    private LocalFileSystem localFileSystemWithInjectedMocks;
     private LocalFileSystem localFileSystem;
 
     @Mock
-    private FileSystemAbstractFactory addHierarchyAbstractFactory;
+    private FileSystemAbstractFactory fileSystemAbstractFactory;
 
     @Mock
     private FileVisitor<Path> addHierarchyVisitor;
@@ -58,35 +55,19 @@ public class LocalFileSystemTest {
     @Mock
     private Path path;
 
-    @Configuration
-    @ComponentScan("com.data_advisor.local.application.entry_point")
-    static class TestConfiguration {
-        // NOTE: Intellij Community Edition does not detect that the @Bean annotation causes
-        // the spring framework to call these functions.
-        // Create mocks to inject beans into the LocalFileSystem constructor.
-
-        @Bean
-        public FileSystemService fileSystemService() {
-            return mock(FileSystemService.class);
-        }
-
-        @Bean
-        public FileSystemAbstractFactory fileSystemAbstractFactory() {
-            return mock(FileSystemAbstractFactory.class);
-        }
-    }
-
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        localFileSystem = spy(localFileSystemWithInjectedMocks);
-        given(addHierarchyAbstractFactory.getFileVisitor()).willReturn(addHierarchyVisitor);
+        given(fileSystemAbstractFactory.getFileSystemService()).willReturn(fileSystemService);
+        given(fileSystemAbstractFactory.getFileVisitor()).willReturn(addHierarchyVisitor);
+        given(fileSystemAbstractFactory.createPath(ABSOLUTE_PATH)).willReturn(path);
     }
 
     @Test
     public void testLocalFileSystem_CanAutowire() {
         assertNotNull(localFileSystemAutowired);
+        assertNotNull(localFileSystemAutowired.fileSystemAbstractFactory);
     }
 
     @Test
@@ -96,8 +77,6 @@ public class LocalFileSystemTest {
         final FileVisitor<Path> addHierarchyVisitor = this.addHierarchyVisitor;
         final FileSystemService fileSystemService = this.fileSystemService;
         final Path path = this.path;
-
-        willReturn(path).given(localFileSystem).createPath(absolutePath);
 
         // WHEN
         localFileSystem.addHierarchy(absolutePath);

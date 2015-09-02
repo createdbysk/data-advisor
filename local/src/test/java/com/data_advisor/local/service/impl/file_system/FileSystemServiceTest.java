@@ -1,5 +1,6 @@
 package com.data_advisor.local.service.impl.file_system;
 
+import com.data_advisor.local.application.ApplicationConfig;
 import com.data_advisor.local.service.file_system.FileSystemService;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,8 +34,8 @@ import static org.mockito.BDDMockito.*;
  *  2. Verify that the injected entities are configured correctly for dependency injection.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-// Convention over configuration, this will automatically look for the nested @Configuration class.
-@ContextConfiguration(loader = AnnotationConfigContextLoader.class)
+// Verify that the ApplicationConfig injects the required objects and dependencies.
+@ContextConfiguration(loader = AnnotationConfigContextLoader.class, classes = {ApplicationConfig.class})
 public class FileSystemServiceTest {
     // Use this instance to verify that the FileSystemServiceImpl has the expected annotation to be able to
     // Autowire an instance of FileSystemService.
