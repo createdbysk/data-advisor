@@ -18,7 +18,7 @@ public class LocalFileSystem {
     final FileSystemAbstractFactory fileSystemAbstractFactory;
 
     @Autowired
-    public LocalFileSystem(FileSystemAbstractFactory fileSystemAbstractFactory) {
+    private LocalFileSystem(FileSystemAbstractFactory fileSystemAbstractFactory) {
         this.fileSystemAbstractFactory = fileSystemAbstractFactory;
     }
 
@@ -31,9 +31,9 @@ public class LocalFileSystem {
      * @param absolutePath  The absolute path to start at.
      */
     public void addHierarchy(String absolutePath) {
-        Path path = fileSystemAbstractFactory.createPath(absolutePath);
+        Path path = fileSystemAbstractFactory.getPath(absolutePath);
         FileSystemService fileSystemService = fileSystemAbstractFactory.getFileSystemService();
-        FileVisitor<Path> addHierarchyVisitor = fileSystemAbstractFactory.getFileVisitor();
+        FileVisitor<Path> addHierarchyVisitor = fileSystemAbstractFactory.createFileVisitor();
         fileSystemService.visitPath(path, addHierarchyVisitor);
     }
 }

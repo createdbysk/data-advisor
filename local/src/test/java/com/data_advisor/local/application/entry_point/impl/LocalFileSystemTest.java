@@ -60,8 +60,8 @@ public class LocalFileSystemTest {
         MockitoAnnotations.initMocks(this);
 
         given(fileSystemAbstractFactory.getFileSystemService()).willReturn(fileSystemService);
-        given(fileSystemAbstractFactory.getFileVisitor()).willReturn(addHierarchyVisitor);
-        given(fileSystemAbstractFactory.createPath(ABSOLUTE_PATH)).willReturn(path);
+        given(fileSystemAbstractFactory.createFileVisitor()).willReturn(addHierarchyVisitor);
+        given(fileSystemAbstractFactory.getPath(ABSOLUTE_PATH)).willReturn(path);
     }
 
     @Test

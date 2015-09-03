@@ -10,6 +10,6 @@ import java.nio.file.Path;
  */
 public interface FileSystemAbstractFactory {
     FileSystemService getFileSystemService();
-    FileVisitor<Path> getFileVisitor();
-    Path createPath(String absolutePath);
+    FileVisitor<Path> createFileVisitor();
+    Path getPath(String absolutePath);
 }

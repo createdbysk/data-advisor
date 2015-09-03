@@ -1,5 +1,6 @@
 package com.data_advisor.local.application;
 
+import org.apache.storm.guava.annotations.VisibleForTesting;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
@@ -16,7 +17,8 @@ public class Main {
         main.loadAndRun(args);
     }
 
-    public Main(AnnotationConfigApplicationContext annotationConfigApplicationContext) {
+    @VisibleForTesting
+    Main(AnnotationConfigApplicationContext annotationConfigApplicationContext) {
         this.annotationConfigApplicationContext = annotationConfigApplicationContext;
     }
 
@@ -24,7 +26,8 @@ public class Main {
      * Load and run the application with the command-line parameters.
      * @param args The command-line parameters.
      */
-    public void loadAndRun(String[] args) {
+    @VisibleForTesting
+    void loadAndRun(String[] args) {
         annotationConfigApplicationContext.register(ApplicationConfig.class);
         annotationConfigApplicationContext.refresh();
         Application application = annotationConfigApplicationContext.getBean(Application.class);

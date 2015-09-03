@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class Application {
     @VisibleForTesting
-    LocalFileSystem localFileSystem;
+    final LocalFileSystem localFileSystem;
 
     @Autowired
     public Application(LocalFileSystem localFileSystem) {
