@@ -2,10 +2,7 @@ package com.data_advisor.local.application.entry_point.impl;
 
 import com.data_advisor.local.application.FileSystemAbstractFactory;
 import com.data_advisor.local.service.file_system.FileSystemService;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.FileVisitor;
@@ -16,9 +13,8 @@ import java.nio.file.Paths;
  * FileSystemAbstractFactory implementation for local file system.
  */
 @Component
-public class LocalFileSystemFactory implements FileSystemAbstractFactory, ApplicationContextAware {
+public class LocalFileSystemFactory implements FileSystemAbstractFactory {
     private final FileSystemService fileSystemService;
-    private ApplicationContext applicationContext;
     /**
      * Private constructor to force use of this object through Dependency injection.
      * @param fileSystemService The file system service instance.
@@ -40,7 +36,7 @@ public class LocalFileSystemFactory implements FileSystemAbstractFactory, Applic
         // a new instance of that class.
         // Define a local variable to ease debugging.
         @SuppressWarnings("redundant")
-        final FileVisitor<Path> fileVisitor = applicationContext.getBean(LocalFileSystemVisitor.class);
+        final FileVisitor<Path> fileVisitor = new LocalFileSystemVisitor(this);
         return fileVisitor;
     }
 
@@ -50,10 +46,5 @@ public class LocalFileSystemFactory implements FileSystemAbstractFactory, Applic
         @SuppressWarnings("redundant")
         Path path = Paths.get(absolutePath);
         return path;
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
     }
 }

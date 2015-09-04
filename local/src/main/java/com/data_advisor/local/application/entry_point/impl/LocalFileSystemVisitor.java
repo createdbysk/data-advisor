@@ -1,8 +1,5 @@
 package com.data_advisor.local.application.entry_point.impl;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
@@ -12,9 +9,19 @@ import java.nio.file.attribute.BasicFileAttributes;
 /**
  * Implementation of {@link FileVisitor} for the LocalFileSystem.
  */
-@Component
-@Scope("prototype")
 public class LocalFileSystemVisitor implements FileVisitor<Path> {
+    private final LocalFileSystemFactory localFileSystemFactory;
+
+    /**
+     * package scoped constructor to enforce that only
+     * LocalFileSystemFactory should instantiate this object.
+     *
+     * @param localFileSystemFactory The factory instance that created this visitor.
+     */
+    LocalFileSystemVisitor(LocalFileSystemFactory localFileSystemFactory) {
+        this.localFileSystemFactory = localFileSystemFactory;
+    }
+
     @Override
     public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
         return null;
