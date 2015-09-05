@@ -1,5 +1,9 @@
 package com.data_advisor.local.application.entry_point.impl;
 
+import org.apache.storm.guava.annotations.VisibleForTesting;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
@@ -11,6 +15,10 @@ import java.nio.file.attribute.BasicFileAttributes;
  */
 public class LocalFileSystemVisitor implements FileVisitor<Path> {
     private final LocalFileSystemFactory localFileSystemFactory;
+
+    // Allow the test to set the logger to expect logging.
+    @VisibleForTesting
+    Logger logger = LoggerFactory.getLogger(LocalFileSystemVisitor.class);
 
     /**
      * package scoped constructor to enforce that only
@@ -24,21 +32,25 @@ public class LocalFileSystemVisitor implements FileVisitor<Path> {
 
     @Override
     public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-        return null;
+        logger.trace("preVisitDirectory({}, {})", dir, attrs);
+        return FileVisitResult.CONTINUE;
     }
 
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-        return null;
+        logger.trace("visitFile({}, {})", file, attrs);
+        return FileVisitResult.CONTINUE;
     }
 
     @Override
     public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-        return null;
+        logger.trace("visitFileFailed({}, {})", file, exc);
+        return FileVisitResult.CONTINUE;
     }
 
     @Override
     public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-        return null;
+        logger.trace("postVisitDirectory({}, {})", dir, exc);
+        return FileVisitResult.CONTINUE;
     }
 }

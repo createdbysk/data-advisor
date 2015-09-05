@@ -19,13 +19,14 @@ import java.util.Set;
  */
 @Service
 public class FileSystemServiceImpl implements FileSystemService {
+    private static final int MAX_DEPTH = 1;
     private Logger logger = LoggerFactory.getLogger(FileSystemServiceImpl.class);
 
     @Override
     public void visitPath(Path path, FileVisitor<Path> fileVisitor) {
         logger.trace("visitPath({}, {})", path, fileVisitor);
         try {
-            walkFileTree(path, EnumSet.noneOf(FileVisitOption.class), 1, fileVisitor);
+            walkFileTree(path, EnumSet.noneOf(FileVisitOption.class), MAX_DEPTH, fileVisitor);
         } catch (IOException e) {
            logger.warn("walkFileTree threw an unexpected exception", e);
         }

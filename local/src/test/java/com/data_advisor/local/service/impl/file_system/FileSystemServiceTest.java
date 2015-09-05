@@ -37,6 +37,7 @@ import static org.mockito.BDDMockito.*;
 // Verify that the ApplicationConfig injects the required objects and dependencies.
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class, classes = {ApplicationConfig.class})
 public class FileSystemServiceTest {
+    private static final int MAX_DEPTH = 1;
     // Use this instance to verify that the FileSystemServiceImpl has the expected annotation to be able to
     // Autowire an instance of FileSystemService.
     // NOTE: Intellij does not detect that this class is Auto-wired.
@@ -85,13 +86,13 @@ public class FileSystemServiceTest {
     public void testListDirectory_WhenNoErrors_CompletesSuccessfully() throws IOException {
         // GIVEN
         // ... see common declarations.
-        willDoNothing().given(fileSystemService).walkFileTree(path, options, 1, fileVisitor);
+        willDoNothing().given(fileSystemService).walkFileTree(path, options, MAX_DEPTH, fileVisitor);
 
         // WHEN
         fileSystemService.visitPath(path, fileVisitor);
 
         // THEN
-        verify(fileSystemService, times(1)).walkFileTree(path, options, 1, fileVisitor);
+        verify(fileSystemService, times(1)).walkFileTree(path, options, MAX_DEPTH, fileVisitor);
         verify(logger, times(1)).trace(anyString(), eq(path), eq(fileVisitor));
     }
 
@@ -100,13 +101,13 @@ public class FileSystemServiceTest {
         // GIVEN
         // ... see common declarations.
         IOException expectedException = new IOException();
-        willThrow(expectedException).given(fileSystemService).walkFileTree(path, options, 1, fileVisitor);
+        willThrow(expectedException).given(fileSystemService).walkFileTree(path, options, MAX_DEPTH, fileVisitor);
 
         // WHEN
         fileSystemService.visitPath(path, fileVisitor);
 
         // THEN
-        verify(fileSystemService, times(1)).walkFileTree(path, options, 1, fileVisitor);
+        verify(fileSystemService, times(1)).walkFileTree(path, options, MAX_DEPTH, fileVisitor);
         verify(logger, times(1)).warn(anyString(), eq(expectedException));
     }
 }
