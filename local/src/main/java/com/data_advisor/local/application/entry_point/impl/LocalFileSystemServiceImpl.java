@@ -1,4 +1,4 @@
-package com.data_advisor.local.service.impl.file_system;
+package com.data_advisor.local.application.entry_point.impl;
 
 import com.data_advisor.local.service.file_system.FileSystemService;
 import org.apache.storm.guava.annotations.VisibleForTesting;
@@ -18,9 +18,9 @@ import java.util.Set;
  * Implements FileSystemService
  */
 @Service
-public class FileSystemServiceImpl implements FileSystemService {
+public class LocalFileSystemServiceImpl implements FileSystemService {
     private static final int MAX_DEPTH = 1;
-    private Logger logger = LoggerFactory.getLogger(FileSystemServiceImpl.class);
+    private Logger logger = LoggerFactory.getLogger(LocalFileSystemServiceImpl.class);
 
     @Override
     public void visitPath(Path path, FileVisitor<Path> fileVisitor) {

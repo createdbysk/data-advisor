@@ -6,7 +6,6 @@ package com.data_advisor.local.application.entry_point.impl;
 
 import com.data_advisor.local.application.ApplicationConfig;
 import com.data_advisor.local.application.FileSystemAbstractFactory;
-import com.data_advisor.local.service.impl.file_system.FileSystemServiceImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +40,7 @@ public class LocalFileSystemFactoryTest {
 
     @Test
     public void test_getFileSystemService() {
-        assertTrue(localFileSystemFactoryAutowired.getFileSystemService() instanceof FileSystemServiceImpl);
+        assertTrue(localFileSystemFactoryAutowired.getFileSystemService() instanceof LocalFileSystemServiceImpl);
     }
 
     @Test

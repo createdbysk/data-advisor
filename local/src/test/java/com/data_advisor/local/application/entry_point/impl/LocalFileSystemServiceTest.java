@@ -1,4 +1,4 @@
-package com.data_advisor.local.service.impl.file_system;
+package com.data_advisor.local.application.entry_point.impl;
 
 import com.data_advisor.local.application.ApplicationConfig;
 import com.data_advisor.local.service.file_system.FileSystemService;
@@ -36,9 +36,9 @@ import static org.mockito.BDDMockito.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 // Verify that the ApplicationConfig injects the required objects and dependencies.
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class, classes = {ApplicationConfig.class})
-public class FileSystemServiceTest {
+public class LocalFileSystemServiceTest {
     private static final int MAX_DEPTH = 1;
-    // Use this instance to verify that the FileSystemServiceImpl has the expected annotation to be able to
+    // Use this instance to verify that the LocalFileSystemServiceImpl has the expected annotation to be able to
     // Autowire an instance of FileSystemService.
     // NOTE: Intellij does not detect that this class is Auto-wired.
     @Autowired
@@ -47,8 +47,8 @@ public class FileSystemServiceTest {
     // To use a spy in order to mock the walkFileTree implementation in fileSystemService,
     // create an instance with @InjectMocks, which will inject the mocks. Then construct the spy in the constructor.
     @InjectMocks
-    private FileSystemServiceImpl fileSystemServiceInjectMocks;
-    private FileSystemServiceImpl fileSystemService;
+    private LocalFileSystemServiceImpl fileSystemServiceInjectMocks;
+    private LocalFileSystemServiceImpl fileSystemService;
 
     @Mock
     private Logger logger;
