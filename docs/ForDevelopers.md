@@ -11,6 +11,8 @@ Therefore, if you want to deprecate a design principle, just mark it so, but do 
   * Use ContextConfiguration and SpringJUnit4TestRunner to Test that the injected entities are configured correctly for 
    dependency injection.
 2. Use the observer pattern to decouple the various components of the application.
+3. Favor composition over inheritance.
+4. Adhere to SOLID principles.
 
 # Development principles 
 * Use a school project to learn and experiment new concepts.  
