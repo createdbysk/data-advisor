@@ -1,5 +1,7 @@
 package com.data_advisor.local.application.entry_point.impl;
 
+import com.data_advisor.local.event.file_system.PathEvent;
+import com.data_advisor.local.event.file_system.PathEventPublisher;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -35,6 +37,12 @@ public class LocalFileSystemVisitorTest {
     @Mock
     private Logger logger;
 
+    @Mock
+    private PathEvent pathEvent;
+
+    @Mock
+    private PathEventPublisher pathEventPublisher;
+
     private IOException ioException;
 
     @Before
@@ -52,7 +60,7 @@ public class LocalFileSystemVisitorTest {
         final Path dir = this.path;
         final BasicFileAttributes attrs = this.attrs;
         final FileVisitResult expectedFileVisitResult = FileVisitResult.CONTINUE;
-        given(this.attrs.isDirectory()).willReturn(true);
+        given(attrs.isDirectory()).willReturn(true);
 
         // WHEN
         FileVisitResult fileVisitResult = fileVisitor.preVisitDirectory(dir, attrs);
@@ -63,13 +71,14 @@ public class LocalFileSystemVisitorTest {
     }
 
     @Test
-    public void test_WhenVisitFile_ThenLogAndContinue() throws IOException {
+    public void test_WhenVisitFile_ThenPublishEventAndLogAndContinue() throws IOException {
         // GIVEN
         final FileVisitor<Path> fileVisitor = localFileSystemVisitor;
         final Path file = this.path;
         final BasicFileAttributes attrs = this.attrs;
         final FileVisitResult expectedFileVisitResult = FileVisitResult.CONTINUE;
-        given(this.attrs.isRegularFile()).willReturn(true);
+        given(localFileSystemFactory.createPathEvent(file, attrs)).willReturn(pathEvent);
+        given(localFileSystemFactory.getPathEventPublisher()).willReturn(pathEventPublisher);
 
         // WHEN
         FileVisitResult fileVisitResult = fileVisitor.visitFile(file, attrs);
@@ -77,6 +86,7 @@ public class LocalFileSystemVisitorTest {
         // THEN
         assertEquals(expectedFileVisitResult, fileVisitResult);
         verify(logger, times(1)).trace("visitFile({}, {})", file, attrs);
+        verify(pathEventPublisher, times(1)).publish(pathEvent);
     }
 
     @Test
@@ -102,7 +112,7 @@ public class LocalFileSystemVisitorTest {
         final Path dir = this.path;
         final IOException ioException = this.ioException;
         final FileVisitResult expectedFileVisitResult = FileVisitResult.CONTINUE;
-        given(this.attrs.isDirectory()).willReturn(true);
+        given(attrs.isDirectory()).willReturn(true);
 
         // WHEN
         FileVisitResult fileVisitResult = fileVisitor.postVisitDirectory(dir, ioException);

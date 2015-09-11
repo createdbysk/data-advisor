@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.ContextConfiguration;
@@ -51,6 +52,9 @@ public class PathEventTest {
     @Mock
     private PathEvent pathEvent;
 
+    @Mock
+    private Logger logger;
+
     /** Use this class to test the abstract PathEvent */
     private class TestPathEvent extends PathEvent {
         public TestPathEvent(Path path, BasicFileAttributes basicFileAttributes) {
@@ -84,7 +88,7 @@ public class PathEventTest {
     }
 
     @Test
-    public void testFileSystemEventPublisher_WhenPublish_ThenPublishesFileSystemEvent() {
+    public void testFileSystemEventPublisher_WhenPublish_ThenPublishesFileSystemEventAndLogs() {
         // GIVEN
         final PathEvent pathEvent = this.pathEvent;
 
@@ -93,5 +97,6 @@ public class PathEventTest {
 
         // THEN
         verify(applicationEventPulisher, times(1)).publishEvent(pathEvent);
+        verify(logger, times(1)).trace("publishEvent(pathEvent={})", pathEvent);
     }
 }

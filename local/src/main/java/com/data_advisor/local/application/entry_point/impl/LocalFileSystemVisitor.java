@@ -1,6 +1,7 @@
 package com.data_advisor.local.application.entry_point.impl;
 
-import org.apache.storm.guava.annotations.VisibleForTesting;
+import com.data_advisor.local.event.file_system.PathEvent;
+import com.data_advisor.local.event.file_system.PathEventPublisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +18,6 @@ public class LocalFileSystemVisitor implements FileVisitor<Path> {
     private final LocalFileSystemFactory localFileSystemFactory;
 
     // Allow the test to set the logger to expect logging.
-    @VisibleForTesting
     Logger logger = LoggerFactory.getLogger(LocalFileSystemVisitor.class);
 
     /**
@@ -39,6 +39,10 @@ public class LocalFileSystemVisitor implements FileVisitor<Path> {
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
         logger.trace("visitFile({}, {})", file, attrs);
+        // Publish the pathEvent to allow listeners to hook into the walk.
+        PathEvent pathEvent = localFileSystemFactory.createPathEvent(file, attrs);
+        PathEventPublisher pathEventPublisher = localFileSystemFactory.getPathEventPublisher();
+        pathEventPublisher.publish(pathEvent);
         return FileVisitResult.CONTINUE;
     }
 

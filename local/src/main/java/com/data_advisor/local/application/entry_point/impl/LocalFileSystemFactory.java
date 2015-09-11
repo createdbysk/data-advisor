@@ -1,6 +1,8 @@
 package com.data_advisor.local.application.entry_point.impl;
 
 import com.data_advisor.local.application.FileSystemAbstractFactory;
+import com.data_advisor.local.event.file_system.PathEvent;
+import com.data_advisor.local.event.file_system.PathEventPublisher;
 import com.data_advisor.local.service.file_system.FileSystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.nio.file.FileVisitor;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 
 /**
  * FileSystemAbstractFactory implementation for local file system.
@@ -15,6 +18,7 @@ import java.nio.file.Paths;
 @Component
 public class LocalFileSystemFactory implements FileSystemAbstractFactory {
     private final FileSystemService fileSystemService;
+
     /**
      * Private constructor to force use of this object through Dependency injection.
      * @param fileSystemService The file system service instance.
@@ -46,5 +50,14 @@ public class LocalFileSystemFactory implements FileSystemAbstractFactory {
         @SuppressWarnings("redundant")
         Path path = Paths.get(absolutePath);
         return path;
+    }
+
+    @Override
+    public PathEvent createPathEvent(Path file, BasicFileAttributes attrs) {
+        return null;
+    }
+
+    public PathEventPublisher getPathEventPublisher() {
+        return null;
     }
 }
