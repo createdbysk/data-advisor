@@ -1,6 +1,8 @@
 package com.data_advisor.local.application.entry_point.impl;
 
 import com.data_advisor.local.application.FileSystemAbstractFactory;
+import com.data_advisor.local.event.file_system.DirectoryPathEvent;
+import com.data_advisor.local.event.file_system.FilePathEvent;
 import com.data_advisor.local.event.file_system.PathEvent;
 import com.data_advisor.local.event.file_system.PathEventPublisher;
 import com.data_advisor.local.service.file_system.FileSystemService;
@@ -53,7 +55,13 @@ public class LocalFileSystemFactory implements FileSystemAbstractFactory {
     }
 
     @Override
-    public PathEvent createPathEvent(Path file, BasicFileAttributes attrs) {
+    public PathEvent createPathEvent(Path path, BasicFileAttributes attrs) {
+        if (attrs.isRegularFile()) {
+            return new FilePathEvent(path, attrs);
+        } else if (attrs.isDirectory()) {
+            return new DirectoryPathEvent(path, attrs);
+        }
+        // TODO: Log an warning that the path was to an unknown type.
         return null;
     }
 
