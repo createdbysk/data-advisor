@@ -9,12 +9,14 @@ import com.data_advisor.local.application.FileSystemAbstractFactory;
 import com.data_advisor.local.event.file_system.DirectoryPathEvent;
 import com.data_advisor.local.event.file_system.FilePathEvent;
 import com.data_advisor.local.event.file_system.PathEvent;
+import com.data_advisor.local.event.file_system.UnhandledPathTypeEvent;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -30,6 +32,8 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 /**
  * Test for the LocalFileSystem class.
@@ -39,6 +43,7 @@ import static org.mockito.BDDMockito.given;
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class, classes = {ApplicationConfig.class})
 public class LocalFileSystemFactoryTest {
     private static final String ABSOLUTE_PATH = "/path";
+
     @Autowired
     private FileSystemAbstractFactory localFileSystemFactoryAutowired;
 
@@ -52,11 +57,22 @@ public class LocalFileSystemFactoryTest {
     private BasicFileAttributes directoryAttributes;
 
     @Mock
+    private BasicFileAttributes unknownPathTypeAttributes;
+
+    @Mock
     private Path path;
+
+    @Mock
+    private Logger logger;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
+
+        // LocalFileSystemFactory does not have a default constructor. This test will use constructor
+        // injection to inject the dependencies of LocalFileSystemFactory. Explicitly set the logger
+        // so that the logger does not have to be a constructor parameter.
+        localFileSystemFactory.logger = this.logger;
 
         given(fileAttributes.isRegularFile()).willReturn(true);
         given(fileAttributes.isDirectory()).willReturn(false);
@@ -79,17 +95,37 @@ public class LocalFileSystemFactoryTest {
 
     @Test
     public void test_getFileVisitor() {
-        FileVisitor<Path> fileVisitorA = localFileSystemFactoryAutowired.createFileVisitor();
-        FileVisitor<Path> fileVisitorB = localFileSystemFactoryAutowired.createFileVisitor();
+        // GIVEN
+        final LocalFileSystemFactory localFileSystemFactory = this.localFileSystemFactory;
+        final Logger logger = this.logger;
+
+        // WHEN
+        FileVisitor<Path> fileVisitorA = localFileSystemFactory.createFileVisitor();
+        FileVisitor<Path> fileVisitorB = localFileSystemFactory.createFileVisitor();
+
+        // THEN
         assertTrue(fileVisitorA instanceof LocalFileSystemVisitor);
         // Verify that createFileVisitor() returns a different instance for each call.
         assertNotSame(fileVisitorA, fileVisitorB);
+
+        verify(logger, times(1)).trace("createFileVisitor() returned {}", fileVisitorA);
+        verify(logger, times(1)).trace("createFileVisitor() returned {}", fileVisitorB);
     }
 
     @Test
     public void test_getPath() {
-        final Path expectedPath = Paths.get(ABSOLUTE_PATH);
-        assertEquals(expectedPath, localFileSystemFactoryAutowired.getPath(ABSOLUTE_PATH));
+        // GIVEN
+        final LocalFileSystemFactory localFileSystemFactory = this.localFileSystemFactory;
+        final String pathString = ABSOLUTE_PATH;
+        final Path expectedPath = Paths.get(pathString);
+        final Logger logger = this.logger;
+
+        // WHEN
+        Path actualPath = localFileSystemFactory.getPath(pathString);
+
+        // THEN
+        assertEquals(expectedPath, actualPath);
+        verify(logger, times(1)).trace("getPath({}) returned {}", pathString, actualPath);
     }
 
     @Test
@@ -98,12 +134,14 @@ public class LocalFileSystemFactoryTest {
         final BasicFileAttributes attrs = this.fileAttributes;
         final Path path = this.path;
         final FileSystemAbstractFactory fileSystemAbstractFactory = this.localFileSystemFactory;
+        final Logger logger = this.logger;
 
         // WHEN
         PathEvent pathEvent = fileSystemAbstractFactory.createPathEvent(path, attrs);
 
         // THEN
         assertTrue(pathEvent instanceof FilePathEvent);
+        verify(logger, times(1)).trace("createPathEvent({}, {}) returned {}", path, attrs, pathEvent);
     }
 
     @Test
@@ -112,11 +150,29 @@ public class LocalFileSystemFactoryTest {
         final BasicFileAttributes attrs = this.directoryAttributes;
         final Path path = this.path;
         final FileSystemAbstractFactory fileSystemAbstractFactory = this.localFileSystemFactory;
+        final Logger logger = this.logger;
 
         // WHEN
         PathEvent pathEvent = fileSystemAbstractFactory.createPathEvent(path, attrs);
 
         // THEN
         assertTrue(pathEvent instanceof DirectoryPathEvent);
+        verify(logger, times(1)).trace("createPathEvent({}, {}) returned {}", path, attrs, pathEvent);
+    }
+
+    @Test
+    public void test_GivenUnknownPathType_WhenCreatePathEvent_WillCreateUnknownPathTypeEvent() {
+        // GIVEN
+        final BasicFileAttributes attrs = this.unknownPathTypeAttributes;
+        final Path path = this.path;
+        final FileSystemAbstractFactory fileSystemAbstractFactory = this.localFileSystemFactory;
+        final Logger logger = this.logger;
+
+        // WHEN
+        PathEvent pathEvent = fileSystemAbstractFactory.createPathEvent(path, attrs);
+
+        // THEN
+        assertTrue(pathEvent instanceof UnhandledPathTypeEvent);
+        verify(logger, times(1)).trace("createPathEvent({}, {}) returned {}", path, attrs, pathEvent);
     }
 }

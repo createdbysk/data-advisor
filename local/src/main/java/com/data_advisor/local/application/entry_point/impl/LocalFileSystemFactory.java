@@ -1,11 +1,11 @@
 package com.data_advisor.local.application.entry_point.impl;
 
 import com.data_advisor.local.application.FileSystemAbstractFactory;
-import com.data_advisor.local.event.file_system.DirectoryPathEvent;
-import com.data_advisor.local.event.file_system.FilePathEvent;
-import com.data_advisor.local.event.file_system.PathEvent;
-import com.data_advisor.local.event.file_system.PathEventPublisher;
+import com.data_advisor.local.event.file_system.*;
 import com.data_advisor.local.service.file_system.FileSystemService;
+import org.apache.storm.guava.annotations.VisibleForTesting;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +19,12 @@ import java.nio.file.attribute.BasicFileAttributes;
  */
 @Component
 public class LocalFileSystemFactory implements FileSystemAbstractFactory {
+    // This class does not have a default constructor.
+    // The test will use constructor injection to inject mocks.
+    // Therefore, allow the test to set the logger.
+    @VisibleForTesting
+    Logger logger = LoggerFactory.getLogger(LocalFileSystemFactory.class);
+
     private final FileSystemService fileSystemService;
 
     /**
@@ -43,6 +49,7 @@ public class LocalFileSystemFactory implements FileSystemAbstractFactory {
         // Define a local variable to ease debugging.
         @SuppressWarnings("redundant")
         final FileVisitor<Path> fileVisitor = new LocalFileSystemVisitor(this);
+        logger.trace("createFileVisitor() returned {}", fileVisitor);
         return fileVisitor;
     }
 
@@ -51,18 +58,23 @@ public class LocalFileSystemFactory implements FileSystemAbstractFactory {
         // Define local variable to aid debugging.
         @SuppressWarnings("redundant")
         Path path = Paths.get(absolutePath);
+
+        logger.trace("getPath({}) returned {}", absolutePath, path);
         return path;
     }
 
     @Override
     public PathEvent createPathEvent(Path path, BasicFileAttributes attrs) {
+        PathEvent pathEvent;
         if (attrs.isRegularFile()) {
-            return new FilePathEvent(path, attrs);
+            pathEvent = new FilePathEvent(path, attrs);
         } else if (attrs.isDirectory()) {
-            return new DirectoryPathEvent(path, attrs);
+            pathEvent = new DirectoryPathEvent(path, attrs);
+        } else {
+            pathEvent = new UnhandledPathTypeEvent(path, attrs);
         }
-        // TODO: Log an warning that the path was to an unknown type.
-        return null;
+        logger.trace("createPathEvent({}, {}) returned {}", path, attrs, pathEvent);
+        return pathEvent;
     }
 
     public PathEventPublisher getPathEventPublisher() {
