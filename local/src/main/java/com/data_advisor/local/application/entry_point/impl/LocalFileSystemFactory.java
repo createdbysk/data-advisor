@@ -67,10 +67,13 @@ public class LocalFileSystemFactory implements FileSystemAbstractFactory {
     public PathEvent createPathEvent(Path path, BasicFileAttributes attrs) {
         PathEvent pathEvent;
         if (attrs.isRegularFile()) {
+            logger.trace("createPathEvent({}, {}) - {} is a file path. Will create a {}.", path, attrs, path, FilePathEvent.class);
             pathEvent = new FilePathEvent(path, attrs);
         } else if (attrs.isDirectory()) {
+            logger.trace("createPathEvent({}, {}) - {} is a directory path. Will create a {}.", path, attrs, path, DirectoryPathEvent.class);
             pathEvent = new DirectoryPathEvent(path, attrs);
         } else {
+            logger.trace("createPathEvent({}, {}) - {} is a path type the application will not handle. Will create a {}.", path, attrs, path, UnhandledPathTypeEvent.class);
             pathEvent = new UnhandledPathTypeEvent(path, attrs);
         }
         logger.trace("createPathEvent({}, {}) returned {}", path, attrs, pathEvent);

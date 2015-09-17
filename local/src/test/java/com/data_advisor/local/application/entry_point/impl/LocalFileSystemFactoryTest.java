@@ -141,6 +141,7 @@ public class LocalFileSystemFactoryTest {
 
         // THEN
         assertTrue(pathEvent instanceof FilePathEvent);
+        verify(logger, times(1)).trace("createPathEvent({}, {}) - {} is a file path. Will create a {}.", path, attrs, path, FilePathEvent.class);
         verify(logger, times(1)).trace("createPathEvent({}, {}) returned {}", path, attrs, pathEvent);
     }
 
@@ -157,6 +158,7 @@ public class LocalFileSystemFactoryTest {
 
         // THEN
         assertTrue(pathEvent instanceof DirectoryPathEvent);
+        verify(logger, times(1)).trace("createPathEvent({}, {}) - {} is a directory path. Will create a {}.", path, attrs, path, DirectoryPathEvent.class);
         verify(logger, times(1)).trace("createPathEvent({}, {}) returned {}", path, attrs, pathEvent);
     }
 
@@ -173,6 +175,7 @@ public class LocalFileSystemFactoryTest {
 
         // THEN
         assertTrue(pathEvent instanceof UnhandledPathTypeEvent);
+        verify(logger, times(1)).trace("createPathEvent({}, {}) - {} is a path type the application will not handle. Will create a {}.", path, attrs, path, UnhandledPathTypeEvent.class);
         verify(logger, times(1)).trace("createPathEvent({}, {}) returned {}", path, attrs, pathEvent);
     }
 }
