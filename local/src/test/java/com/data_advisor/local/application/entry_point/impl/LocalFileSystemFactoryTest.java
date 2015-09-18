@@ -6,10 +6,11 @@ package com.data_advisor.local.application.entry_point.impl;
 
 import com.data_advisor.local.application.ApplicationConfig;
 import com.data_advisor.local.application.FileSystemAbstractFactory;
-import com.data_advisor.local.event.file_system.DirectoryPathEvent;
-import com.data_advisor.local.event.file_system.FilePathEvent;
 import com.data_advisor.local.event.file_system.PathEvent;
-import com.data_advisor.local.event.file_system.UnhandledPathTypeEvent;
+import com.data_advisor.local.event.file_system.impl.DirectoryPathEvent;
+import com.data_advisor.local.event.file_system.impl.FilePathEvent;
+import com.data_advisor.local.event.file_system.impl.PathEventPublisherImpl;
+import com.data_advisor.local.event.file_system.impl.UnhandledPathTypeEvent;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -86,11 +87,12 @@ public class LocalFileSystemFactoryTest {
     @Test
     public void testLocalFileSystemFactory_CanAutowire() {
         assertNotNull(localFileSystemFactoryAutowired);
+        assertTrue(localFileSystemFactoryAutowired.getFileSystemService() instanceof LocalFileSystemServiceImpl);
+        assertTrue(localFileSystemFactoryAutowired.getPathEventPublisher() instanceof PathEventPublisherImpl);
     }
 
     @Test
     public void test_getFileSystemService() {
-        assertTrue(localFileSystemFactoryAutowired.getFileSystemService() instanceof LocalFileSystemServiceImpl);
     }
 
     @Test

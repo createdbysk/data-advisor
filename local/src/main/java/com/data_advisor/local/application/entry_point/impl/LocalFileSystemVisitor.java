@@ -1,5 +1,6 @@
 package com.data_advisor.local.application.entry_point.impl;
 
+import com.data_advisor.local.application.FileSystemAbstractFactory;
 import com.data_advisor.local.event.file_system.PathEvent;
 import com.data_advisor.local.event.file_system.PathEventPublisher;
 import org.slf4j.Logger;
@@ -15,7 +16,7 @@ import java.nio.file.attribute.BasicFileAttributes;
  * Implementation of {@link FileVisitor} for the LocalFileSystem.
  */
 public class LocalFileSystemVisitor implements FileVisitor<Path> {
-    private final LocalFileSystemFactory localFileSystemFactory;
+    private final FileSystemAbstractFactory fileSystemAbstractFactory;
 
     // Allow the test to set the logger to expect logging.
     Logger logger = LoggerFactory.getLogger(LocalFileSystemVisitor.class);
@@ -24,10 +25,10 @@ public class LocalFileSystemVisitor implements FileVisitor<Path> {
      * package scoped constructor to enforce that only
      * LocalFileSystemFactory should instantiate this object.
      *
-     * @param localFileSystemFactory The factory instance that created this visitor.
+     * @param fileSystemAbstractFactory The factory instance that created this visitor.
      */
-    LocalFileSystemVisitor(LocalFileSystemFactory localFileSystemFactory) {
-        this.localFileSystemFactory = localFileSystemFactory;
+    LocalFileSystemVisitor(FileSystemAbstractFactory fileSystemAbstractFactory) {
+        this.fileSystemAbstractFactory = fileSystemAbstractFactory;
     }
 
     @Override
@@ -40,8 +41,8 @@ public class LocalFileSystemVisitor implements FileVisitor<Path> {
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
         logger.trace("visitFile({}, {})", file, attrs);
         // Publish the pathEvent to allow listeners to hook into the walk.
-        PathEvent pathEvent = localFileSystemFactory.createPathEvent(file, attrs);
-        PathEventPublisher pathEventPublisher = localFileSystemFactory.getPathEventPublisher();
+        PathEvent pathEvent = fileSystemAbstractFactory.createPathEvent(file, attrs);
+        PathEventPublisher pathEventPublisher = fileSystemAbstractFactory.getPathEventPublisher();
         pathEventPublisher.publish(pathEvent);
         return FileVisitResult.CONTINUE;
     }

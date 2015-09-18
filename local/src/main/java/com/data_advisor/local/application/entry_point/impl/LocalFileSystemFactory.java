@@ -1,7 +1,11 @@
 package com.data_advisor.local.application.entry_point.impl;
 
 import com.data_advisor.local.application.FileSystemAbstractFactory;
-import com.data_advisor.local.event.file_system.*;
+import com.data_advisor.local.event.file_system.PathEvent;
+import com.data_advisor.local.event.file_system.PathEventPublisher;
+import com.data_advisor.local.event.file_system.impl.DirectoryPathEvent;
+import com.data_advisor.local.event.file_system.impl.FilePathEvent;
+import com.data_advisor.local.event.file_system.impl.UnhandledPathTypeEvent;
 import com.data_advisor.local.service.file_system.FileSystemService;
 import org.apache.storm.guava.annotations.VisibleForTesting;
 import org.slf4j.Logger;
@@ -26,15 +30,18 @@ public class LocalFileSystemFactory implements FileSystemAbstractFactory {
     Logger logger = LoggerFactory.getLogger(LocalFileSystemFactory.class);
 
     private final FileSystemService fileSystemService;
+    private final PathEventPublisher pathEventPublisher;
 
     /**
      * Private constructor to force use of this object through Dependency injection.
-     * @param fileSystemService The file system service instance.
+     * @param fileSystemService The FileSystemService instance.
+     * @param pathEventPublisher The PathEventPublisher instance.
      *
      */
     @Autowired
-    private LocalFileSystemFactory(FileSystemService fileSystemService) {
+    private LocalFileSystemFactory(FileSystemService fileSystemService, PathEventPublisher pathEventPublisher) {
         this.fileSystemService = fileSystemService;
+        this.pathEventPublisher = pathEventPublisher;
     }
 
     @Override
@@ -81,6 +88,6 @@ public class LocalFileSystemFactory implements FileSystemAbstractFactory {
     }
 
     public PathEventPublisher getPathEventPublisher() {
-        return null;
+        return pathEventPublisher;
     }
 }

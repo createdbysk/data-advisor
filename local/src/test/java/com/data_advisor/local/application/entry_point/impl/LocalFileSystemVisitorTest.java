@@ -1,5 +1,6 @@
 package com.data_advisor.local.application.entry_point.impl;
 
+import com.data_advisor.local.application.FileSystemAbstractFactory;
 import com.data_advisor.local.event.file_system.PathEvent;
 import com.data_advisor.local.event.file_system.PathEventPublisher;
 import org.junit.Before;
@@ -26,7 +27,7 @@ public class LocalFileSystemVisitorTest {
     private LocalFileSystemVisitor localFileSystemVisitor;
 
     @Mock
-    private LocalFileSystemFactory localFileSystemFactory;
+    private FileSystemAbstractFactory fileSystemAbstractFactory;
 
     @Mock
     private Path path;
@@ -48,7 +49,7 @@ public class LocalFileSystemVisitorTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        localFileSystemVisitor = new LocalFileSystemVisitor(localFileSystemFactory);
+        localFileSystemVisitor = new LocalFileSystemVisitor(fileSystemAbstractFactory);
         localFileSystemVisitor.logger = logger;
         ioException = new IOException();
     }
@@ -77,8 +78,8 @@ public class LocalFileSystemVisitorTest {
         final Path file = this.path;
         final BasicFileAttributes attrs = this.attrs;
         final FileVisitResult expectedFileVisitResult = FileVisitResult.CONTINUE;
-        given(localFileSystemFactory.createPathEvent(file, attrs)).willReturn(pathEvent);
-        given(localFileSystemFactory.getPathEventPublisher()).willReturn(pathEventPublisher);
+        given(fileSystemAbstractFactory.createPathEvent(file, attrs)).willReturn(pathEvent);
+        given(fileSystemAbstractFactory.getPathEventPublisher()).willReturn(pathEventPublisher);
 
         // WHEN
         FileVisitResult fileVisitResult = fileVisitor.visitFile(file, attrs);
