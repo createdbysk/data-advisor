@@ -1,13 +1,16 @@
-package com.data_advisor.local.application.entry_point.impl;
+package com.data_advisor.infrastructure;
 
-import com.data_advisor.local.application.FileSystemAbstractFactory;
-import com.data_advisor.local.event.file_system.PathEvent;
-import com.data_advisor.local.event.file_system.PathEventPublisher;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -16,18 +19,26 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 /**
- * Test class {@link LocalFileSystemVisitor}
+ * Test FileVisitorChainBuilder
+ * Use the SpringJUnit4ClassRunner to auto-wire injected dependencies. This ensures that the dependencies don't miss
+ * expected annotations. This satisfies Design Principle #2.
+ *  2. Verify that the injected entities are configured correctly for dependency injection.
  */
-public class LocalFileSystemVisitorTest {
-    private LocalFileSystemVisitor localFileSystemVisitor;
+@RunWith(SpringJUnit4ClassRunner.class)
+// Verify that the ApplicationConfig injects the required objects and dependencies.
+@ContextConfiguration(loader = AnnotationConfigContextLoader.class, classes = {InfrastructureConfig.class})
+public class FileVisitorChainBuilderTest {
+    @Autowired
+    private FileVisitorChainBuilder fileVisitorChainBuilderAutowired;
 
-    @Mock
-    private FileSystemAbstractFactory fileSystemAbstractFactory;
+    @InjectMocks
+    private FileVisitorChainBuilder fileVisitorChainBuilder;
 
     @Mock
     private Path path;
@@ -38,32 +49,30 @@ public class LocalFileSystemVisitorTest {
     @Mock
     private Logger logger;
 
-    @Mock
-    private PathEvent pathEvent;
-
-    @Mock
-    private PathEventPublisher pathEventPublisher;
-
     private IOException ioException;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        localFileSystemVisitor = new LocalFileSystemVisitor(fileSystemAbstractFactory);
-        localFileSystemVisitor.logger = logger;
         ioException = new IOException();
+    }
+
+    @Test
+    public void testFileVisitorChainBuilder_CanAutowire() {
+        assertNotNull(fileVisitorChainBuilderAutowired);
     }
 
     @Test
     public void test_WhenPreVisitDirectory_ThenLogAndContinue() throws IOException {
         // GIVEN
-        final FileVisitor<Path> fileVisitor = localFileSystemVisitor;
+        final FileVisitorChainBuilder fileVisitorChainBuilder = this.fileVisitorChainBuilder;
         final Path dir = this.path;
         final BasicFileAttributes attrs = this.attrs;
         final FileVisitResult expectedFileVisitResult = FileVisitResult.CONTINUE;
-        given(attrs.isDirectory()).willReturn(true);
+        given(this.attrs.isDirectory()).willReturn(true);
 
         // WHEN
+        FileVisitor<Path> fileVisitor = fileVisitorChainBuilder.create();
         FileVisitResult fileVisitResult = fileVisitor.preVisitDirectory(dir, attrs);
 
         // THEN
@@ -72,33 +81,33 @@ public class LocalFileSystemVisitorTest {
     }
 
     @Test
-    public void test_WhenVisitFile_ThenPublishEventAndLogAndContinue() throws IOException {
+    public void test_WhenVisitFile_ThenLogAndContinue() throws IOException {
         // GIVEN
-        final FileVisitor<Path> fileVisitor = localFileSystemVisitor;
+        final FileVisitorChainBuilder fileVisitorChainBuilder = this.fileVisitorChainBuilder;
         final Path file = this.path;
         final BasicFileAttributes attrs = this.attrs;
         final FileVisitResult expectedFileVisitResult = FileVisitResult.CONTINUE;
-        given(fileSystemAbstractFactory.createPathEvent(file, attrs, localFileSystemVisitor)).willReturn(pathEvent);
-        given(fileSystemAbstractFactory.getPathEventPublisher()).willReturn(pathEventPublisher);
+        given(this.attrs.isRegularFile()).willReturn(true);
 
         // WHEN
+        FileVisitor<Path> fileVisitor = fileVisitorChainBuilder.create();
         FileVisitResult fileVisitResult = fileVisitor.visitFile(file, attrs);
 
         // THEN
         assertEquals(expectedFileVisitResult, fileVisitResult);
         verify(logger, times(1)).trace("visitFile({}, {})", file, attrs);
-        verify(pathEventPublisher, times(1)).publish(pathEvent);
     }
 
     @Test
     public void test_WhenVisitFileFailed_ThenLogAndContinue() throws IOException {
         // GIVEN
-        final FileVisitor<Path> fileVisitor = localFileSystemVisitor;
+        final FileVisitorChainBuilder fileVisitorChainBuilder = this.fileVisitorChainBuilder;
         final Path file = this.path;
         final IOException ioException = this.ioException;
         final FileVisitResult expectedFileVisitResult = FileVisitResult.CONTINUE;
 
         // WHEN
+        FileVisitor<Path> fileVisitor = fileVisitorChainBuilder.create();
         FileVisitResult fileVisitResult = fileVisitor.visitFileFailed(file, ioException);
 
         // THEN
@@ -109,13 +118,14 @@ public class LocalFileSystemVisitorTest {
     @Test
     public void test_WhenPostVisitDirectory_ThenLogAndContinue() throws IOException {
         // GIVEN
-        final FileVisitor<Path> fileVisitor = localFileSystemVisitor;
+        final FileVisitorChainBuilder fileVisitorChainBuilder = this.fileVisitorChainBuilder;
         final Path dir = this.path;
         final IOException ioException = this.ioException;
         final FileVisitResult expectedFileVisitResult = FileVisitResult.CONTINUE;
-        given(attrs.isDirectory()).willReturn(true);
+        given(this.attrs.isDirectory()).willReturn(true);
 
         // WHEN
+        FileVisitor<Path> fileVisitor = fileVisitorChainBuilder.create();
         FileVisitResult fileVisitResult = fileVisitor.postVisitDirectory(dir, ioException);
 
         // THEN

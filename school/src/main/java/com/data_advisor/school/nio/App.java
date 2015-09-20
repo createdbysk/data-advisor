@@ -48,6 +48,11 @@ public class App {
     }
 
     public static void main(String[] args) {
+        if (args == null || args.length <= 0) {
+            System.out.println("Walks the tree rooted at the given root directory.");
+            System.out.println("Usage: <executable> <root directory>");
+            System.exit(1);
+        }
         Path path = Paths.get(args[0]);
         FileVisitor fileVisitor = new FileVisitor();
         try {
