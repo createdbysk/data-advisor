@@ -23,7 +23,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 /**
- * Test the Application class.
+ * Test the {@link LocalFileSystem} class.
  * Use the SpringJUnit4ClassRunner to auto-wire injected dependencies. This ensures that the dependencies don't miss
  * expected annotations. This satisfies Design Principle #2.
  *  2. Verify that the injected entities are configured correctly for dependency injection.

@@ -27,6 +27,9 @@ import java.nio.file.FileVisitor;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import static junit.framework.Assert.assertNotSame;
 import static junit.framework.TestCase.assertEquals;
@@ -37,7 +40,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 /**
- * Test for the LocalFileSystem class.
+ * Test for the {@link LocalFileSystem} class.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 // Convention over configuration, this will automatically look for the nested @Configuration class.
@@ -45,6 +48,9 @@ import static org.mockito.Mockito.verify;
 public class LocalFileSystemFactoryTest {
     private static final String ABSOLUTE_PATH = "/path";
 
+    // Use this instance to verify that the LocalFileSystemFactory has the expected annotation to be able to
+    // Autowire an instance of FileSystemAbstractFactory.
+    // NOTE: Intellij does not detect that this class is Auto-wired.
     @Autowired
     private FileSystemAbstractFactory localFileSystemFactoryAutowired;
 
@@ -89,10 +95,7 @@ public class LocalFileSystemFactoryTest {
         assertNotNull(localFileSystemFactoryAutowired);
         assertTrue(localFileSystemFactoryAutowired.getFileSystemService() instanceof LocalFileSystemServiceImpl);
         assertTrue(localFileSystemFactoryAutowired.getPathEventPublisher() instanceof PathEventPublisherImpl);
-    }
-
-    @Test
-    public void test_getFileSystemService() {
+        assertTrue(localFileSystemFactoryAutowired.getFilesGroupedBySize() instanceof HashMap);
     }
 
     @Test
@@ -139,7 +142,7 @@ public class LocalFileSystemFactoryTest {
         final Logger logger = this.logger;
 
         // WHEN
-        PathEvent pathEvent = fileSystemAbstractFactory.createPathEvent(path, attrs);
+        PathEvent pathEvent = fileSystemAbstractFactory.createPathEvent(path, attrs, this);
 
         // THEN
         assertTrue(pathEvent instanceof FilePathEvent);
@@ -156,7 +159,7 @@ public class LocalFileSystemFactoryTest {
         final Logger logger = this.logger;
 
         // WHEN
-        PathEvent pathEvent = fileSystemAbstractFactory.createPathEvent(path, attrs);
+        PathEvent pathEvent = fileSystemAbstractFactory.createPathEvent(path, attrs, this);
 
         // THEN
         assertTrue(pathEvent instanceof DirectoryPathEvent);
@@ -173,11 +176,25 @@ public class LocalFileSystemFactoryTest {
         final Logger logger = this.logger;
 
         // WHEN
-        PathEvent pathEvent = fileSystemAbstractFactory.createPathEvent(path, attrs);
+        PathEvent pathEvent = fileSystemAbstractFactory.createPathEvent(path, attrs, this);
 
         // THEN
         assertTrue(pathEvent instanceof UnhandledPathTypeEvent);
         verify(logger, times(1)).trace("createPathEvent({}, {}) - {} is a path type the application will not handle. Will create a {}.", path, attrs, path, UnhandledPathTypeEvent.class);
         verify(logger, times(1)).trace("createPathEvent({}, {}) returned {}", path, attrs, pathEvent);
     }
+
+    @Test
+    public void testCreateFileGroup() {
+        // GIVEN
+        final Logger logger = this.logger;
+        final FileSystemAbstractFactory fileSystemAbstractFactory = this.localFileSystemFactory;
+
+        // WHEN
+        List<FilePathEvent> fileGroup = fileSystemAbstractFactory.createFileGroup();
+
+        // THEN
+        assertTrue(fileGroup instanceof ArrayList);
+        verify(logger, times(1)).trace("createFileGroup() - return {}", fileGroup);
+     }
 }

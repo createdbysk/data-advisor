@@ -21,7 +21,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 /**
- * Test class LocalSystemVisitor
+ * Test class {@link LocalFileSystemVisitor}
  */
 public class LocalFileSystemVisitorTest {
     private LocalFileSystemVisitor localFileSystemVisitor;
@@ -78,7 +78,7 @@ public class LocalFileSystemVisitorTest {
         final Path file = this.path;
         final BasicFileAttributes attrs = this.attrs;
         final FileVisitResult expectedFileVisitResult = FileVisitResult.CONTINUE;
-        given(fileSystemAbstractFactory.createPathEvent(file, attrs)).willReturn(pathEvent);
+        given(fileSystemAbstractFactory.createPathEvent(file, attrs, localFileSystemVisitor)).willReturn(pathEvent);
         given(fileSystemAbstractFactory.getPathEventPublisher()).willReturn(pathEventPublisher);
 
         // WHEN

@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class PathEventPublisherImpl implements ApplicationEventPublisherAware, PathEventPublisher {
-    @VisibleForTesting
     private Logger logger = LoggerFactory.getLogger(PathEventPublisher.class);
 
     @VisibleForTesting

@@ -41,7 +41,7 @@ public class LocalFileSystemVisitor implements FileVisitor<Path> {
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
         logger.trace("visitFile({}, {})", file, attrs);
         // Publish the pathEvent to allow listeners to hook into the walk.
-        PathEvent pathEvent = fileSystemAbstractFactory.createPathEvent(file, attrs);
+        PathEvent pathEvent = fileSystemAbstractFactory.createPathEvent(file, attrs, this);
         PathEventPublisher pathEventPublisher = fileSystemAbstractFactory.getPathEventPublisher();
         pathEventPublisher.publish(pathEvent);
         return FileVisitResult.CONTINUE;

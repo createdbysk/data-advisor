@@ -32,7 +32,11 @@ public class LocalFileSystemServiceImpl implements FileSystemService {
         }
     }
 
-    /** Convenience method to be able to stub Files.walkFileTree() without Powermockito or similar library */
+    /**
+     * Convenience method to be able to stub Files.walkFileTree() without Powermockito or similar library
+     *
+     * This method will NOT have a unit test. It will appear as not covered in code-coverage.
+     * */
     @VisibleForTesting
     void walkFileTree(Path path, Set<FileVisitOption> options, int maxDepth, FileVisitor<Path> fileVisitor) throws IOException {
         Files.walkFileTree(path, options, maxDepth, fileVisitor);

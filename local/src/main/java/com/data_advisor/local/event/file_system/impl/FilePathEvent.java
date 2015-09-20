@@ -9,7 +9,7 @@ import java.nio.file.attribute.BasicFileAttributes;
  * PathEvent instance for file paths.
  */
 public class FilePathEvent extends PathEvent {
-    public FilePathEvent(Path path, BasicFileAttributes basicFileAttributes) {
-        super(path, basicFileAttributes);
+    public FilePathEvent(Path path, BasicFileAttributes basicFileAttributes, Object source) {
+        super(path, basicFileAttributes, source);
     }
 }

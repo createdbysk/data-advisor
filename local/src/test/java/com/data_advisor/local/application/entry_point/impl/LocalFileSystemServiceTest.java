@@ -28,7 +28,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.BDDMockito.*;
 
 /**
- * Test for class RotaryFileSystemServiceImpl
+ * Test for class {@link LocalFileSystemServiceImpl}
  * Use the SpringJUnit4ClassRunner to auto-wire injected dependencies. This ensures that the dependencies don't miss
  * expected annotations. This satisfies Design Principle #2.
  *  2. Verify that the injected entities are configured correctly for dependency injection.

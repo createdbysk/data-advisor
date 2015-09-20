@@ -17,6 +17,10 @@ import java.nio.file.FileVisitor;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * FileSystemAbstractFactory implementation for local file system.
@@ -31,6 +35,7 @@ public class LocalFileSystemFactory implements FileSystemAbstractFactory {
 
     private final FileSystemService fileSystemService;
     private final PathEventPublisher pathEventPublisher;
+    private final Map<Long, List<FilePathEvent>> filesGroupedBySize;
 
     /**
      * Private constructor to force use of this object through Dependency injection.
@@ -42,13 +47,16 @@ public class LocalFileSystemFactory implements FileSystemAbstractFactory {
     private LocalFileSystemFactory(FileSystemService fileSystemService, PathEventPublisher pathEventPublisher) {
         this.fileSystemService = fileSystemService;
         this.pathEventPublisher = pathEventPublisher;
+        this.filesGroupedBySize = new HashMap<>();
     }
 
+    /** {@inheritDoc} */
     @Override
     public FileSystemService getFileSystemService() {
         return fileSystemService;
     }
 
+    /** {@inheritDoc} */
     @Override
     public FileVisitor<Path> createFileVisitor() {
         // LocalFileSystemVisitor has prototype scope. So every call to getBean() returns
@@ -60,6 +68,7 @@ public class LocalFileSystemFactory implements FileSystemAbstractFactory {
         return fileVisitor;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Path getPath(String absolutePath) {
         // Define local variable to aid debugging.
@@ -70,24 +79,41 @@ public class LocalFileSystemFactory implements FileSystemAbstractFactory {
         return path;
     }
 
+    /** {@inheritDoc} */
     @Override
-    public PathEvent createPathEvent(Path path, BasicFileAttributes attrs) {
+    public PathEvent createPathEvent(Path path, BasicFileAttributes attrs, Object source) {
         PathEvent pathEvent;
         if (attrs.isRegularFile()) {
             logger.trace("createPathEvent({}, {}) - {} is a file path. Will create a {}.", path, attrs, path, FilePathEvent.class);
-            pathEvent = new FilePathEvent(path, attrs);
+            pathEvent = new FilePathEvent(path, attrs, source);
         } else if (attrs.isDirectory()) {
             logger.trace("createPathEvent({}, {}) - {} is a directory path. Will create a {}.", path, attrs, path, DirectoryPathEvent.class);
-            pathEvent = new DirectoryPathEvent(path, attrs);
+            pathEvent = new DirectoryPathEvent(path, attrs, source);
         } else {
             logger.trace("createPathEvent({}, {}) - {} is a path type the application will not handle. Will create a {}.", path, attrs, path, UnhandledPathTypeEvent.class);
-            pathEvent = new UnhandledPathTypeEvent(path, attrs);
+            pathEvent = new UnhandledPathTypeEvent(path, attrs, source);
         }
         logger.trace("createPathEvent({}, {}) returned {}", path, attrs, pathEvent);
         return pathEvent;
     }
 
+    /** {@inheritDoc} */
+    @Override
     public PathEventPublisher getPathEventPublisher() {
         return pathEventPublisher;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Map<Long, List<FilePathEvent>> getFilesGroupedBySize() {
+        return filesGroupedBySize;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<FilePathEvent> createFileGroup() {
+        List<FilePathEvent> fileGroup = new ArrayList<>();
+        logger.trace("createFileGroup() - return {}", fileGroup);
+        return fileGroup;
     }
 }
