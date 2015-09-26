@@ -15,6 +15,12 @@ public class Main {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
         Main main = new Main(ctx);
         main.loadAndRun(args);
+
+        FileSystemAbstractFactory factory = ctx.getBean(FileSystemAbstractFactory.class);
+        System.out.println("---------------------------------------------------------------------------");
+        System.out.println("FILES GROUPED BY SIZE");
+        System.out.println("---------------------------------------------------------------------------");
+        System.out.println(factory.getFilesGroupedBySize());
     }
 
     @VisibleForTesting
