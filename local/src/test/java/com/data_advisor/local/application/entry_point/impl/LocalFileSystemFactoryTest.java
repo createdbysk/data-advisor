@@ -191,10 +191,10 @@ public class LocalFileSystemFactoryTest {
         final FileSystemAbstractFactory fileSystemAbstractFactory = this.localFileSystemFactory;
 
         // WHEN
-        List<FilePathEvent> fileGroup = fileSystemAbstractFactory.createFileGroup();
+        List<FilePathEvent> fileGroup = fileSystemAbstractFactory.createFilesGroup();
 
         // THEN
         assertTrue(fileGroup instanceof ArrayList);
-        verify(logger, times(1)).trace("createFileGroup() - return {}", fileGroup);
+        verify(logger, times(1)).trace("createFilesGroup() - return {}", fileGroup);
      }
 }

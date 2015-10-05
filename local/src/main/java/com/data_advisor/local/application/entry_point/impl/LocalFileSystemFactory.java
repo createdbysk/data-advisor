@@ -111,9 +111,15 @@ public class LocalFileSystemFactory implements FileSystemAbstractFactory {
 
     /** {@inheritDoc} */
     @Override
-    public List<FilePathEvent> createFileGroup() {
+    public Map<String, List<FilePathEvent>> getFilesGroupedByMd5Hash() {
+        return null;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<FilePathEvent> createFilesGroup() {
         List<FilePathEvent> fileGroup = new ArrayList<>();
-        logger.trace("createFileGroup() - return {}", fileGroup);
+        logger.trace("createFilesGroup() - return {}", fileGroup);
         return fileGroup;
     }
 }

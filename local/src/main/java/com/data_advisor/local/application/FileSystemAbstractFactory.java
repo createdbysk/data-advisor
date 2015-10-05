@@ -41,5 +41,8 @@ public interface FileSystemAbstractFactory {
     Map<Long, List<FilePathEvent>> getFilesGroupedBySize();
 
     /** Create the container for a group of files */
-    List<FilePathEvent> createFileGroup();
+    List<FilePathEvent> createFilesGroup();
+
+    /** Get a view of the files mapped by their md5 hash. Use a {@link Map} to represent this view. */
+    Map<String, List<FilePathEvent>> getFilesGroupedByMd5Hash();
 }

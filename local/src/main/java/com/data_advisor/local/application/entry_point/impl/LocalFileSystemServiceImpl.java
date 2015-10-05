@@ -32,6 +32,11 @@ public class LocalFileSystemServiceImpl implements FileSystemService {
         }
     }
 
+    @Override
+    public String computeMd5Hash(Path filePath) {
+        return null;
+    }
+
     /**
      * Convenience method to be able to stub Files.walkFileTree() without Powermockito or similar library
      *
