@@ -84,7 +84,7 @@ public class GroupFiles {
         List<FilePathEvent> fileGroup;
         if (filesGroupedByMd5Hash.containsKey(fileMd5Hash)) {
             fileGroup = filesGroupedByMd5Hash.get(fileMd5Hash);
-            logger.debug("execute({}) - will add file to group with md5 hash {}", filePathEvent, fileMd5Hash);
+            logger.debug("execute({}) - will add file to group with MD5 hash {}", filePathEvent, fileMd5Hash);
         } else {
             fileGroup = fileSystemAbstractFactory.createFilesGroup();
             filesGroupedByMd5Hash.put(fileMd5Hash, fileGroup);

@@ -143,7 +143,7 @@ public class GroupFilesTest {
         final FilePathEvent filePathEvent = this.filePathEvent;
         final GroupFiles groupFiles = this.groupFiles;
         final Map<Long, List<FilePathEvent>> filesGroupedBySize = this.filesGroupedBySize;
-        final Map<String, List<FilePathEvent>> filesGroupedByMd5Hash = this.filesGroupedByMd5Hash;
+        final FileSystemAbstractFactory fileSystemAbstractFactory = this.fileSystemAbstractFactory;
         final Long fileSize = FILE_SIZE;
         final Logger logger = this.logger;
         // Group for files of FILE_SIZE
@@ -172,6 +172,7 @@ public class GroupFilesTest {
         final FilePathEvent differentSizeFilePathEvent = this.differentSizeFilePathEvent;
         final GroupFiles groupFiles = this.groupFiles;
         final Map<Long, List<FilePathEvent>> filesGroupedBySize = this.filesGroupedBySize;
+        final FileSystemAbstractFactory fileSystemAbstractFactory = this.fileSystemAbstractFactory;
         final Long differentFileSize = DIFFERENT_FILE_SIZE;
         final Logger logger = this.logger;
         // First group of files
@@ -202,6 +203,7 @@ public class GroupFilesTest {
         final FilePathEvent sameSizeFilePathEvent = this.sameSizeFilePathEvent;
         final GroupFiles groupFilesPathEventListener = this.groupFiles;
         final Map<Long, List<FilePathEvent>> filesGroupedBySize = this.filesGroupedBySize;
+        final FileSystemAbstractFactory fileSystemAbstractFactory = this.fileSystemAbstractFactory;
         final Long fileSize = FILE_SIZE;
         final Long sameFileSize = SAME_FILE_SIZE;
         final String fileMd5Hash = FILE_MD5_HASH;
@@ -242,5 +244,51 @@ public class GroupFilesTest {
         verify(logger, times(1)).debug("execute({}) - will add file to group with size {}", sameSizeFilePathEvent, sameFileSize);
         verify(logger, times(1)).debug("execute({}) - created a new group for files with MD5 hash {}", filePathEvent, fileMd5Hash);
         verify(logger, times(1)).debug("execute({}) - created a new group for files with MD5 hash {}", sameSizeFilePathEvent, differentFileMd5Hash);
+    }
+
+    @Test
+    public void test_GivenTwoFilesOfSameSizeAndSameMd5Hash_WhenReceiveFilePathEvent_ThenFilesGroupedBySizeHasOneGroupOfTwoAndFilesGroupedByMd5HashHasOneGroupOfTwo() {
+        // GIVEN
+        final FilePathEvent filePathEvent = this.filePathEvent;
+        final FilePathEvent sameMd5HashFilePathEvent = this.sameMd5HashFilePathEvent;
+        final GroupFiles groupFilesPathEventListener = this.groupFiles;
+        final Map<Long, List<FilePathEvent>> filesGroupedBySize = this.filesGroupedBySize;
+        final Map<String, List<FilePathEvent>> filesGroupedByMd5Hash = this.filesGroupedByMd5Hash;
+        final FileSystemAbstractFactory fileSystemAbstractFactory = this.fileSystemAbstractFactory;
+        final Long fileSize = FILE_SIZE;
+        final Long sameFileSize = SAME_FILE_SIZE;
+        final String fileMd5Hash = FILE_MD5_HASH;
+        final String sameMd5Hash = SAME_MD5_HASH;
+        final Logger logger = this.logger;
+
+        // Containers for groups of files.
+        // Create two containers - one for the files grouped by size and one for the files grouped by md5 hash.
+        List<FilePathEvent> fileGroup1 = new ArrayList<>();
+        List<FilePathEvent> fileGroup2 = new ArrayList<>();
+        given(fileSystemAbstractFactory.createFilesGroup())
+                .willReturn(fileGroup1)
+                .willReturn(fileGroup2);
+
+        // WHEN
+        groupFilesPathEventListener.execute(filePathEvent);
+        groupFilesPathEventListener.execute(sameMd5HashFilePathEvent);
+
+        // THEN
+        List<FilePathEvent> storedFilesBySizeGroup = filesGroupedBySize.get(sameFileSize);
+        assertEquals(storedFilesBySizeGroup.size(), 2);
+        assertSame(storedFilesBySizeGroup.get(0), filePathEvent);
+        assertSame(storedFilesBySizeGroup.get(1), sameMd5HashFilePathEvent);
+        List<FilePathEvent> storedFilesByMd5HashGroup = filesGroupedByMd5Hash.get(fileMd5Hash);
+        assertEquals(storedFilesByMd5HashGroup.size(), 2);
+        assertSame(storedFilesByMd5HashGroup.get(0), filePathEvent);
+        assertSame(storedFilesByMd5HashGroup.get(1), sameMd5HashFilePathEvent);
+        // Once for the file size and twice for the md5 hash.
+        verify(fileSystemAbstractFactory, times(2)).createFilesGroup();
+        verify(logger, times(1)).trace("execute({})", filePathEvent);
+        verify(logger, times(1)).trace("execute({})", sameMd5HashFilePathEvent);
+        verify(logger, times(1)).debug("execute({}) - created a new group for files with size {}", filePathEvent, fileSize);
+        verify(logger, times(1)).debug("execute({}) - will add file to group with size {}", sameMd5HashFilePathEvent, sameFileSize);
+        verify(logger, times(1)).debug("execute({}) - created a new group for files with MD5 hash {}", filePathEvent, fileMd5Hash);
+        verify(logger, times(1)).debug("execute({}) - will add file to group with MD5 hash {}", sameMd5HashFilePathEvent, sameMd5Hash);
     }
 }
