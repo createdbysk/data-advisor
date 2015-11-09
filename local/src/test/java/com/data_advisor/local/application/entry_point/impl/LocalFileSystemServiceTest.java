@@ -15,15 +15,20 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
+import org.springframework.util.ResourceUtils;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitor;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.EnumSet;
 import java.util.Set;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.BDDMockito.*;
 
@@ -38,6 +43,7 @@ import static org.mockito.BDDMockito.*;
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class, classes = {ApplicationConfig.class})
 public class LocalFileSystemServiceTest {
     private static final int MAX_DEPTH = Integer.MAX_VALUE;
+
     // Use this instance to verify that the LocalFileSystemServiceImpl has the expected annotation to be able to
     // Autowire an instance of FileSystemService.
     // NOTE: Intellij does not detect that this class is Auto-wired.
@@ -109,5 +115,40 @@ public class LocalFileSystemServiceTest {
         // THEN
         verify(fileSystemService, times(1)).walkFileTree(path, options, MAX_DEPTH, fileVisitor);
         verify(logger, times(1)).warn(anyString(), eq(expectedException));
+    }
+
+    @Test
+    public void testFileSystemService_GivenValidFilePath_WhencomputeMd5Hash_ThenReturnMd5HashOfFile() throws FileNotFoundException {
+        // GIVEN
+        // A neutral app computed this value.
+        final String expectedMd5Hash = "3E0782C5C22A2AC3FA160C93FD130AC2";
+        final File file = ResourceUtils.getFile("classpath:com/data_advisor/local/application/entry_point/impl/test_input_file.txt");
+        final Path path = file.toPath();
+        final FileSystemService fileSystemService = this.fileSystemService;
+
+        // WHEN
+        final String computedMd5Hash = fileSystemService.computeMd5Hash(path);
+
+        // THEN
+        // Change both values to lower case
+        assertEquals(expectedMd5Hash.toLowerCase(), computedMd5Hash.toLowerCase());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testFileSystemService_GivenNonExistentFilePath_WhencomputeMd5Hash_ThenThrowRuntimeException() throws FileNotFoundException {
+        // GIVEN
+        final Path path = Paths.get("ThisFile.DoesNotExist");
+        final String nonExistentFilePath = path.toAbsolutePath().normalize().toString();
+        final FileSystemService fileSystemService = this.fileSystemService;
+
+        try {
+            // WHEN
+            fileSystemService.computeMd5Hash(path);
+        } catch(RuntimeException e) {
+            // THEN
+            final String message = String.format("computeMd5Hash(%s) threw an exception - ", nonExistentFilePath);
+            verify(logger, times(1)).warn(message, e.getCause());
+            throw e;
+        }
     }
 }

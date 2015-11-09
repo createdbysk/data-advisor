@@ -42,13 +42,18 @@ public class LocalFileSystemServiceImpl implements FileSystemService {
      */
     @Override
     public String computeMd5Hash(Path filePath) {
-        String filePathString = filePath.toAbsolutePath().normalize().toString();
+        // Introduce local variables for debugging purposes.
+        Path absolutePath = filePath.toAbsolutePath();
+        Path normalizedPath = absolutePath.normalize();
+        String filePathString = normalizedPath.toString();
         try {
-            FileInputStream fis = new FileInputStream(filePathString);
-            BufferedInputStream bis = new BufferedInputStream(fis);
-            return DigestUtils.md5Hex(bis);
+            FileInputStream fileInputStream = new FileInputStream(filePathString);
+            // Buffer the input stream to improve performance.
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
+            return DigestUtils.md5Hex(bufferedInputStream);
         } catch (IOException e) {
-            logger.warn(String.format("computeMd5Hash(%s) threw an exception - ", filePathString), e);
+            final String message = String.format("computeMd5Hash(%s) threw an exception - ", filePathString);
+            logger.warn(message, e);
             throw new RuntimeException(e);
         }
     }
