@@ -1,11 +1,14 @@
 package com.data_advisor.local.application.entry_point.impl;
 
 import com.data_advisor.local.service.file_system.FileSystemService;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.storm.guava.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitor;
@@ -19,7 +22,7 @@ import java.util.Set;
  */
 @Service
 public class LocalFileSystemServiceImpl implements FileSystemService {
-    private static final int MAX_DEPTH = 1;
+    private static final int MAX_DEPTH = Integer.MAX_VALUE;
     private Logger logger = LoggerFactory.getLogger(LocalFileSystemServiceImpl.class);
 
     @Override
@@ -32,9 +35,27 @@ public class LocalFileSystemServiceImpl implements FileSystemService {
         }
     }
 
+    /**
+     * @see <a href="http://www.codejava.net/coding/how-to-calculate-md5-and-sha-hash-values-in-java">Calculate MD5</a>
+     * @param filePath  The path of the file.
+     * @return the md5 hash of the file.
+     */
     @Override
     public String computeMd5Hash(Path filePath) {
-        return null;
+        // Introduce local variables for debugging purposes.
+        Path absolutePath = filePath.toAbsolutePath();
+        Path normalizedPath = absolutePath.normalize();
+        String filePathString = normalizedPath.toString();
+        try {
+            FileInputStream fileInputStream = new FileInputStream(filePathString);
+            // Buffer the input stream to improve performance.
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
+            return DigestUtils.md5Hex(bufferedInputStream);
+        } catch (IOException e) {
+            final String message = String.format("computeMd5Hash(%s) threw an exception - ", filePathString);
+            logger.warn(message, e);
+            throw new RuntimeException(e);
+        }
     }
 
     /**

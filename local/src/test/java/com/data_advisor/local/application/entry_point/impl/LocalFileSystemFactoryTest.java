@@ -96,6 +96,7 @@ public class LocalFileSystemFactoryTest {
         assertTrue(localFileSystemFactoryAutowired.getFileSystemService() instanceof LocalFileSystemServiceImpl);
         assertTrue(localFileSystemFactoryAutowired.getPathEventPublisher() instanceof PathEventPublisherImpl);
         assertTrue(localFileSystemFactoryAutowired.getFilesGroupedBySize() instanceof HashMap);
+        assertTrue(localFileSystemFactoryAutowired.getFilesGroupedByMd5Hash() instanceof HashMap);
     }
 
     @Test
