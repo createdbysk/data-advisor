@@ -21,6 +21,10 @@ public class Main {
         System.out.println("FILES GROUPED BY SIZE");
         System.out.println("---------------------------------------------------------------------------");
         System.out.println(factory.getFilesGroupedBySize());
+        System.out.println("---------------------------------------------------------------------------");
+        System.out.println("FILES GROUPED BY MD5");
+        System.out.println("---------------------------------------------------------------------------");
+        System.out.println(factory.getFilesGroupedByMd5Hash());
     }
 
     @VisibleForTesting

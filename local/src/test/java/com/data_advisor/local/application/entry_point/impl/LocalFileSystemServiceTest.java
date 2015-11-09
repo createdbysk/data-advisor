@@ -37,7 +37,7 @@ import static org.mockito.BDDMockito.*;
 // Verify that the ApplicationConfig injects the required objects and dependencies.
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class, classes = {ApplicationConfig.class})
 public class LocalFileSystemServiceTest {
-    private static final int MAX_DEPTH = 1;
+    private static final int MAX_DEPTH = Integer.MAX_VALUE;
     // Use this instance to verify that the LocalFileSystemServiceImpl has the expected annotation to be able to
     // Autowire an instance of FileSystemService.
     // NOTE: Intellij does not detect that this class is Auto-wired.

@@ -33,4 +33,9 @@ public abstract class PathEvent extends ApplicationEvent {
     public BasicFileAttributes getBasicFileAttributes() {
         return basicFileAttributes;
     }
+
+    @Override
+    public String toString() {
+        return path.toAbsolutePath().normalize().toString();
+    }
 }

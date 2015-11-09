@@ -36,6 +36,7 @@ public class LocalFileSystemFactory implements FileSystemAbstractFactory {
     private final FileSystemService fileSystemService;
     private final PathEventPublisher pathEventPublisher;
     private final Map<Long, List<FilePathEvent>> filesGroupedBySize;
+    private final Map<String, List<FilePathEvent>> filesGroupedByMd5Hash;
 
     /**
      * Private constructor to force use of this object through Dependency injection.
@@ -48,6 +49,7 @@ public class LocalFileSystemFactory implements FileSystemAbstractFactory {
         this.fileSystemService = fileSystemService;
         this.pathEventPublisher = pathEventPublisher;
         this.filesGroupedBySize = new HashMap<>();
+        this.filesGroupedByMd5Hash = new HashMap<>();
     }
 
     /** {@inheritDoc} */
@@ -112,7 +114,7 @@ public class LocalFileSystemFactory implements FileSystemAbstractFactory {
     /** {@inheritDoc} */
     @Override
     public Map<String, List<FilePathEvent>> getFilesGroupedByMd5Hash() {
-        return null;
+        return filesGroupedByMd5Hash;
     }
 
     /** {@inheritDoc} */
