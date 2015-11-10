@@ -1,5 +1,6 @@
 package com.data_advisor.local.application.entry_point.impl;
 
+import com.data_advisor.infrastructure.UniqueIdGenerator;
 import com.data_advisor.local.application.ApplicationConfig;
 import com.data_advisor.local.service.file_system.FileSystemService;
 import org.junit.Before;
@@ -43,6 +44,7 @@ import static org.mockito.BDDMockito.*;
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class, classes = {ApplicationConfig.class})
 public class LocalFileSystemServiceTest {
     private static final int MAX_DEPTH = Integer.MAX_VALUE;
+    private static final String UUID_FOR_FAILED_MD5 = "de305d54-75b4-431b-adb2-eb6b9e546014";
 
     // Use this instance to verify that the LocalFileSystemServiceImpl has the expected annotation to be able to
     // Autowire an instance of FileSystemService.
@@ -69,6 +71,9 @@ public class LocalFileSystemServiceTest {
 
     @Mock
     private BasicFileAttributes basicFileAttributes;
+
+    @Mock
+    private UniqueIdGenerator uniqueIdGenerator;
 
     @Configuration
     @ComponentScan(basePackages = {"com.data_advisor.local.service.impl.file_system"})
@@ -134,21 +139,26 @@ public class LocalFileSystemServiceTest {
         assertEquals(expectedMd5Hash.toLowerCase(), computedMd5Hash.toLowerCase());
     }
 
-    @Test(expected = RuntimeException.class)
-    public void testFileSystemService_GivenNonExistentFilePath_WhencomputeMd5Hash_ThenThrowRuntimeException() throws FileNotFoundException {
+    /** Test for the case where the computeMd5Hash generates an IOException. In most cases,
+     * this will happen because the file system denied access to the file. In those cases,
+     * set the md5 hash to be an invalid value. To make this value unique, use a guid.
+     */
+    @Test
+    public void testFileSystemService_GivenAccessToFileThrowsIOException_WhencomputeMd5Hash_ThenReturnGeneratedGUID() {
         // GIVEN
         final Path path = Paths.get("ThisFile.DoesNotExist");
         final String nonExistentFilePath = path.toAbsolutePath().normalize().toString();
         final FileSystemService fileSystemService = this.fileSystemService;
+        final String uuidString = UUID_FOR_FAILED_MD5;
+        final UniqueIdGenerator uniqueIdGenerator = this.uniqueIdGenerator;
+        given(uniqueIdGenerator.generate()).willReturn(uuidString);
 
-        try {
-            // WHEN
-            fileSystemService.computeMd5Hash(path);
-        } catch(RuntimeException e) {
-            // THEN
-            final String message = String.format("computeMd5Hash(%s) threw an exception - ", nonExistentFilePath);
-            verify(logger, times(1)).warn(message, e.getCause());
-            throw e;
-        }
+        // WHEN
+        final String computedMd5Hash = fileSystemService.computeMd5Hash(path);
+
+        // THEN
+        final String message = String.format("computeMd5Hash(%s) threw an exception - ", nonExistentFilePath);
+        verify(logger, times(1)).warn(eq(message), any(IOException.class));
+        assertEquals(uuidString, computedMd5Hash);
     }
 }

@@ -1,10 +1,12 @@
 package com.data_advisor.local.application.entry_point.impl;
 
+import com.data_advisor.infrastructure.UniqueIdGenerator;
 import com.data_advisor.local.service.file_system.FileSystemService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.storm.guava.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedInputStream;
@@ -24,6 +26,9 @@ import java.util.Set;
 public class LocalFileSystemServiceImpl implements FileSystemService {
     private static final int MAX_DEPTH = Integer.MAX_VALUE;
     private Logger logger = LoggerFactory.getLogger(LocalFileSystemServiceImpl.class);
+
+    @Autowired
+    private UniqueIdGenerator uniqueIdGenerator;
 
     @Override
     public void visitPath(Path path, FileVisitor<Path> fileVisitor) {
@@ -52,9 +57,17 @@ public class LocalFileSystemServiceImpl implements FileSystemService {
             BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
             return DigestUtils.md5Hex(bufferedInputStream);
         } catch (IOException e) {
+            // It appears as though the primary reason for failure is that the the file system denied
+            // access to the file. This is a fairly common issue. To allow the process to continue,
+            // this method should fail gracefully. Given that with this exception the contents of the
+            // file are unknown, this method cannot compute the MD5 hash.
+            // In those case, generate use a unique identifier as the value for the
+            // md5 hash so that the files that generated this exception do not get grouped by md5 hash
+            // and still allow the calling process to continue its execution.
             final String message = String.format("computeMd5Hash(%s) threw an exception - ", filePathString);
             logger.warn(message, e);
-            throw new RuntimeException(e);
+            final String uniqueId = uniqueIdGenerator.generate();
+            return uniqueId;
         }
     }
 
